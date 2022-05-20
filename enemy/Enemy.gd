@@ -6,7 +6,7 @@ var _current_direction: int = -1 # -1 = No Movement, 0 = UP, 1 = RIGHT, 2 = DOWN
 
 onready var anim_tree: AnimationTree = get_node("AnimationTree")
 onready var player: KinematicBody2D = get_node("../Player")
-
+onready var enemy: KinematicBody2D = get_node("../Enemy")
 
 var _num_valid_directions: int = 0
 
@@ -66,15 +66,19 @@ func choose_direction() -> int:
 	for raycast in ray_up:
 		if raycast.get_collider() is TileMap:
 			valid_directions.remove(valid_directions.find(0))
+				
 	for raycast in ray_right:
 		if raycast.get_collider() is TileMap:
 			valid_directions.remove(valid_directions.find(1))
+				
 	for raycast in ray_down:
 		if raycast.get_collider() is TileMap:
 			valid_directions.remove(valid_directions.find(2))
+				
 	for raycast in ray_left:
 		if raycast.get_collider() is TileMap:
 			valid_directions.remove(valid_directions.find(3))
+				
 	return valid_directions[randi() % valid_directions.size()]
 
 func check_num_valid_directions() -> int:
@@ -120,3 +124,20 @@ func check_player_collision():
 				die()
 			else:
 				player.take_life(1)
+				
+		elif get_slide_collision(i).collider == enemy:
+			print(_current_direction)
+			if _current_direction == 0:
+				_current_direction = 2
+				
+			elif _current_direction == 1:
+				_current_direction = 3
+				
+			elif _current_direction == 2:
+				_current_direction = 0
+				
+			elif _current_direction == 3:
+				_current_direction = 1
+				
+			else:
+				_current_direction = 0
