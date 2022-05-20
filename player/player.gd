@@ -42,6 +42,9 @@ var _direction = null
 var _curr_action = null
 var _next_action = null
 
+# for global variable access
+#onready var Global = get_node("/root/Global")
+
 # for respawning
 onready var _start_pos = get_position()
 
@@ -65,6 +68,7 @@ func _ready():
 	# _next_action = Action.RIGHT
 	print("game start")
 	_direction = _ray_right
+	Global.lives -= 1
 
 
 #func _input(_event):
@@ -111,14 +115,22 @@ func power_up():
 	print("player cannot kill")
 
 
-func take_life(damage: int = 1):
+func take_life(damage: int):
 	# return if death animation is playing
-#	if _anim_tree.get("parameters/state/current") == 1:
-#		return
+	# if _anim_tree.get("parameters/state/current") == 1:
+	#	return
 
 	# lives should always be between 0 and MAX_LIVES
 	var old_lives = Global.lives
-	Global.lives = int(min(max(Global.lives - damage, -1), Global.MAX_LIVES))
+	# Global.lives = int(min(max(Global.lives - damage, -1), Global.MAX_LIVES))
+	
+	Global.lives = old_lives - damage
+	
+	if Global.lives < -1:
+		Global.lives = -1
+	elif Global.lives > Global.MAX_LIVES:
+		Global.lives = Global.MAX_LIVES
+		
 
 	# early exit case for unit testing
 	if _move_sprite == null:
@@ -139,7 +151,7 @@ func take_life(damage: int = 1):
 		emit_signal("lives_changed")
 		print("player healed. " + str(old_lives) + " + "\
 				+ str(damage) + " = " + str(Global.lives))
-
+				
 
 func _queue_movement():
 	if Input.is_action_just_pressed("ui_up"):
@@ -231,7 +243,7 @@ func _respawn():
 	yield(_timer_game_over, "timeout")
 
 	# reset to default lives and score values
-	Global.lives = Global.MAX_LIVES - 1
+	Global.lives = Global.MAX_LIVES
 	Global.score = 0
 
 	# warning-ignore:return_value_discarded
