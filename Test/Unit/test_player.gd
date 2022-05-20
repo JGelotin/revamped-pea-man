@@ -60,6 +60,25 @@ func test_take_negative_over_life():
 	assert_eq(Global.lives, Global.MAX_LIVES, "Lives should not exceed "\
 			+ str(Global.MAX_LIVES))
 
+func test_add_life_upon_death():
+	# In this game, -1 value means the end of game and lives go back to 3
+	# This test mimics a sort of reincarnation mechanic lol
+	Global.lives = -1
+	_player.take_life(-1)
+	
+	assert_eq(Global.lives, 0, "Value should be 0. Player should have no more extra lives left")
+	
+func test_player_took_on_a_horde_of_enemies_and_died():
+	# Player gets jumped by all the enemies at the same time
+	# and is constantly and brutally attacked until death
+	
+	Global.lives = 3
+	_player.take_life(1)
+	_player.take_life(1)
+	_player.take_life(1)
+	_player.take_life(1)
+	
+	assert_eq(Global.lives, -1, "Player should have no extra lives left (-1) and game resets")
 
 func test_add_score():
 	Global.score = 1
@@ -80,7 +99,12 @@ func test_add_score_not_negative():
 	_player.add_score(-20)
 	
 	assert_eq(Global.score, 0, "Score should not be less than 0")
-
+	
+func test_subtract_score_to_reach_min():
+	Global.score = 1
+	_player.add_score(-1)
+	
+	assert_eq(Global.score, 0, "Score should be 0")
 
 func test_add_score_over_max_int():
 	Global.score = Global.MAX_INT - 10
@@ -94,4 +118,10 @@ func test_add_score_near_max_int():
 	_player.add_score(100)
 
 	assert_eq(Global.score, Global.MAX_INT, "Score should be max int")
+	
+func test_add_score_to_reach_max():
+	Global.score = Global.MAX_INT - 10
+	_player.add_score(10)
+	
+	assert_eq(Global.score, Global.MAX_INT, "Score should be 0")
 
